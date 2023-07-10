@@ -22,14 +22,6 @@ Table of Contents
 
    lab-environment
    docker
-   kubernetes
-   coreos
-
-Feedback
-========
-
-Please go to github https://github.com/xiaopeng163/docker-k8s-lab and create issue or PR, thanks.
-
 
 Indices and tables
 ==================
