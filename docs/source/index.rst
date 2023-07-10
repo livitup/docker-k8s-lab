@@ -21,7 +21,6 @@ Table of Contents
    :maxdepth: 2
 
    lab-environment
-   docker
 
 Indices and tables
 ==================
