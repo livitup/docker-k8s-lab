@@ -47,10 +47,6 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
-# General information about the project.
-project = u'Docker Kubernetes Lab'
-copyright = u'2016, Peng Xiao'
-author = u'Peng Xiao'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
