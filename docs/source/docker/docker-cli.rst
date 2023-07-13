@@ -9,7 +9,7 @@ Docker images can be pulled from the docker hub, or build from ``Dockerfile``.
 docker pull
 ~~~~~~~~~~~~
 
-``docker pull`` will pull a docker image from image registry, it's docker hub by default.
+``docker pull`` will pull a docker image from image registry.  The default registry is the Internet-based docker hub.
 
 .. code-block:: bash
 
@@ -43,7 +43,7 @@ Create a ``Dockerfile`` in current folder.
 
   $ more Dockerfile
   FROM        ubuntu:14.04
-  MAINTAINER  xiaoquwl@gmail.com
+  MAINTAINER  <<your email address>>
   RUN         apt-get update && apt-get install -y redis-server
   EXPOSE      6379
   ENTRYPOINT  ["/usr/bin/redis-server"]
@@ -52,7 +52,7 @@ Use ``docker build`` to create a image.
 
 .. code-block:: bash
 
-  $ docker build -t xiaopeng163/redis:0.1 .
+  $ docker build -t livitup/redis:0.1 .
   $ docker images
   REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
   xiaopeng163/redis   0.1                 ccbca61a8ed4        7 seconds ago       212.4 MB
@@ -63,7 +63,7 @@ docker history
 
 .. code-block:: bash
 
-  $ docker history xiaopeng163/redis:0.1
+  $ docker history livitup/redis:0.1
   IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
   ccbca61a8ed4        2 minutes ago       /bin/sh -c #(nop) ENTRYPOINT ["/usr/bin/redis   0 B
   13d13c016420        2 minutes ago       /bin/sh -c #(nop) EXPOSE 6379/tcp               0 B
@@ -164,23 +164,24 @@ Start a container in interactive mode
 Start a container in background
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Start a container in background using ``xiaopeng163/redis:0.1`` image, and the name of the container is ``demo``.
-Through ``docker ps`` we can see all running Containers
+Start a container in background using the ``redis:latest`` image, setting the name of the container to ``demo``.
+The ``redis`` image is pubically advertised by the Redis maintainers.  ``:latest`` instructs Docker to use the latest image published by the maintainer.  
+Using ``docker ps`` we can see all running Containers
 
 .. code-block:: bash
 
-  $ docker run -d --name demo xiaopeng163/redis:0.1
+  $ docker run -d --name demo redis:latest
   4791db4ff0ef5a1ad9ff7c405bd7705d95779b2e9209967ffbef66cbaee80f3a
   $ docker ps
-  CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS               NAMES
-  4791db4ff0ef        xiaopeng163/redis:0.1   "/usr/bin/redis-serve"   5 seconds ago       Up 4 seconds        6379/tcp            demo
+  CONTAINER ID   IMAGE                 COMMAND                  CREATED              STATUS              PORTS      NAMES
+  a5279cad27b8   redis:latest          "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp   demo
 
 stop/remove containers
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Sometime, we want to manage multiple containers each time,  like ``start``, ``stop``, ``rm``.
 
-Firstly, we can use ``--filter`` to filter out the containers we want to manage.
+First, we can use ``--filter`` to filter out the containers we want to manage.
 
 .. code-block:: bash
 
