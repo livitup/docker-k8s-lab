@@ -24,7 +24,7 @@ docker pull
   Digest: sha256:edb984703bd3e8981ff541a5b9297ca1b81fde6e6e8094d86e390a38ebc30b4d
   Status: Downloaded newer image for ubuntu:14.04
 
-If the image has already on you host.
+If the image has already on your host.
 
 .. code-block:: bash
 
@@ -40,22 +40,27 @@ docker build
 Create a ``Dockerfile`` in current folder.
 
 .. code-block:: bash
+  cd ~
+  mkdir docker_demo
 
-  $ more Dockerfile
+Edit a new file named ``Dockerfile`` with the following contents:
+
+.. code-block:: bash
+
   FROM        ubuntu:14.04
   MAINTAINER  <<your email address>>
   RUN         apt-get update && apt-get install -y redis-server
   EXPOSE      6379
   ENTRYPOINT  ["/usr/bin/redis-server"]
 
-Use ``docker build`` to create a image.
+Use ``docker build`` to create a image.  Tag the version as 0.1 indicating it's an alpha build.
 
 .. code-block:: bash
 
-  $ docker build -t livitup/redis:0.1 .
+  $ docker build -t redis_localdemo:0.1 .
   $ docker images
   REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-  xiaopeng163/redis   0.1                 ccbca61a8ed4        7 seconds ago       212.4 MB
+  redis_localdemo     0.1                 ccbca61a8ed4        7 seconds ago       212.4 MB
   ubuntu              14.04               3f755ca42730        2 days ago          187.9 MB
 
 docker history
@@ -63,7 +68,7 @@ docker history
 
 .. code-block:: bash
 
-  $ docker history livitup/redis:0.1
+  $ docker history redis_localdemo:0.1
   IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
   ccbca61a8ed4        2 minutes ago       /bin/sh -c #(nop) ENTRYPOINT ["/usr/bin/redis   0 B
   13d13c016420        2 minutes ago       /bin/sh -c #(nop) EXPOSE 6379/tcp               0 B
@@ -86,12 +91,13 @@ docker images
 
   $ docker images
   REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+  redis_localdemo     0.1                 9789f6256bf2        45 seconds ago      204MB
   ubuntu              14.04               aae2b63c4946        12 hours ago        187.9 MB
 
 docker rmi
 ~~~~~~~~~~
 
-Remove docker images.
+Remove docker images.  Use the Image ID found via the ``docker images`` command.
 
 .. code-block:: bash
 
@@ -164,44 +170,69 @@ Start a container in interactive mode
 Start a container in background
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Start a container in background using the ``redis:latest`` image, setting the name of the container to ``demo``.
-The ``redis`` image is pubically advertised by the Redis maintainers.  ``:latest`` instructs Docker to use the latest image published by the maintainer.  
-Using ``docker ps`` we can see all running Containers
+Start a container in background using the ``redis_localdemo:0.1`` image, setting the name of the container to ``demo``.
+Using ``docker ps`` we can see all running Containers.
 
 .. code-block:: bash
 
-  $ docker run -d --name demo redis:latest
+  $ docker run -d --name demo redis_localdemo:0.1
   4791db4ff0ef5a1ad9ff7c405bd7705d95779b2e9209967ffbef66cbaee80f3a
   $ docker ps
   CONTAINER ID   IMAGE                 COMMAND                  CREATED              STATUS              PORTS      NAMES
-  a5279cad27b8   redis:latest          "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp   demo
+  a5279cad27b8   redis_localdemo:0.1   "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp   demo
 
 stop/remove containers
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Sometime, we want to manage multiple containers each time,  like ``start``, ``stop``, ``rm``.
 
-First, we can use ``--filter`` to filter out the containers we want to manage.
+List the running containers:
+
+.. code-block:: bash
+  $ docker ps
+  CONTAINER ID   IMAGE                 COMMAND                  CREATED         STATUS         PORTS      NAMES
+  c6c0c39d3858   redis_localdemo:0.1   "/usr/bin/redis-serv…"   2 minutes ago   Up 2 seconds   6379/tcp   demo
+
+Stop a running container:
+
+.. code-block:: bash
+  $ docker stop c6c0c39d3858
+  c6c0c39d3858
+  $
+
+Note that Docker returns the container ID on most container commands.  This is useful when scripting container operations, as the output of a Docker command can be piped to another command.
+
+In order to see all the containers on a server, including stopped continers, the ``-a`` option must be given to the ``docker ps`` command.
+
+.. code-block:: bash
+  $ docker ps
+  CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+  $ docker ps -a
+  CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS                      PORTS     NAMES
+  3e7f1004fd0b   redis_localdemo:0.1   "/usr/bin/redis-serv…"   8 seconds ago    Exited (0) 2 seconds ago              demo
+  811c860d5841   ubuntu:14.04          "/bin/bash"              47 seconds ago   Exited (0) 19 seconds ago             test3
+
+Docker allows for batch operations using container IDs as variables. First, we can use ``--filter`` to filter out the containers we want to manage.
 
 .. code-block:: bash
 
   $ docker ps -a --filter "status=exited"
   CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
-  c05d6d379459        centos:7            "/bin/bash -c 'while "   3 days ago          Exited (137) 11 hours ago                       test3
-  8975cb01d142        centos:7            "/bin/bash -c 'while "   5 days ago          Exited (137) 3 days ago                         test2
+  3e7f1004fd0b   redis_localdemo:0.1   "/usr/bin/redis-serv…"   8 seconds ago    Exited (0) 2 seconds ago              demo
+  811c860d5841   ubuntu:14.04          "/bin/bash"              47 seconds ago   Exited (0) 19 seconds ago             test3
 
 Secondly, we can use ``-q`` option to list only containers ids
 
 .. code-block:: bash
 
   $ docker ps -aq --filter "status=exited"
-  c05d6d379459
-  8975cb01d142
+  3e7f1004fd0b
+  811c860d5841
 
 At last, we can batch processing these containers, like remove them all or start them all:
 
 .. code-block:: bash
 
   $ docker rm $(docker ps -aq --filter "status=exited")
-  c05d6d379459
-  8975cb01d142
+  3e7f1004fd0b
+  811c860d5841
