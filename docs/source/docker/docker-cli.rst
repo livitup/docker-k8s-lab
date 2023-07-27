@@ -65,6 +65,7 @@ Use ``docker build`` to create a image.  Tag the version as 0.1 indicating it's 
   
 docker history
 ~~~~~~~~~~~~~~
+The `docker history` command will show the changes that have been made to a docker image over time.
 
 .. code-block:: bash
 
@@ -97,7 +98,7 @@ docker images
 docker rmi
 ~~~~~~~~~~
 
-The ``docker rmi`` comand will remove docker images.  Use the `Image ID` found via the ``docker images`` command to delete the ``Ubuntu`` image you installed earlier.
+The ``docker rmi`` comand will remove docker images.  Use the `Image ID` found via the ``docker images`` command to delete the `Ubuntu` image you installed earlier.
 
 .. code-block:: bash
 
@@ -122,6 +123,8 @@ Docker Containers
 
 Start a container in interactive mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Normally a docker container will start and run in the background (or exit if it's task is complete).  Use the ``-i`` argument to start a container in `interactive` mode.  Then you will be able to interact with the container.
 
 .. code-block:: bash
 
@@ -189,9 +192,10 @@ Using ``docker ps`` we can see all running Containers.
 stop/remove containers
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes we want to manage multiple containers at one time, using commands like ``start``, ``stop``, ``rm``.
+Sometimes we want to manage multiple containers at one time, using commands like ``start``, ``stop``, and ``rm``.
 
 List the running containers:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
   $ docker ps
@@ -205,8 +209,6 @@ Stop a running container using the `CONTAINER ID` shown by ``docker ps``:
   c6c0c39d3858
   $
 
-Note that Docker returns the container ID on most container commands.  This is useful when scripting container operations, as the output of a Docker command can be piped to another command.
-
 In order to see all the containers on a server, including stopped continers, the ``-a`` option must be given to the ``docker ps`` command.
 
 .. code-block:: bash
@@ -217,7 +219,7 @@ In order to see all the containers on a server, including stopped continers, the
   3e7f1004fd0b   redis_localdemo:0.1   "/usr/bin/redis-serv…"   8 seconds ago    Exited (0) 2 seconds ago              demo
   811c860d5841   ubuntu:14.04          "/bin/bash"              47 seconds ago   Exited (0) 19 seconds ago             test3
 
-Docker allows for batch operations using container IDs as variables. First, we can use ``--filter`` to filter out the containers we want to manage.
+Note that Docker returns the container ID on most container commands.  This is useful when scripting container operations, as the output of a Docker command can be piped to another command.  Docker allows for batch operations using container IDs as variables. First, we can use ``--filter`` to filter out the containers we want to manage.
 
 .. code-block:: bash
 
