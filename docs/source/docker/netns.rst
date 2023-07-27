@@ -1,14 +1,13 @@
 Linux Network Namespace Introduction
 =====================================
 
-In this tutorial, we will learn what is Linux network namespace and how to use it.
+In this tutorial, we will learn ahout the Linux network namespace and how to use it.
 
 Docker uses many Linux namespace technologies for isolation, there are user namespace, process namespace, etc. For network isolation
-docker uses Linux network namespace technology, each docker container has its own network namespace, which means it has its own IP address,
+docker uses Linux network namespace technology: each docker container has its own network namespace, which means it has its own IP address,
 routing table, etc.
 
-First, let's see how to create and check a network namespace. The lab environment we used today is a docker host which is created by docker-machine tool
-on Amazon AWS.
+First, let's see how to create and check a network namespace.
 
 Create and List Network Namespace
 ----------------------------------
@@ -17,10 +16,10 @@ Use ``ip netns add <network namespace name>`` to create a network namespace, and
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip netns add test1
-    ubuntu@docker-host-aws:~$ ip netns list
+    $ ip netns add test1
+    $ ip netns list
     test1
-    ubuntu@docker-host-aws:~$
+    $
 
 
 Delete Network Namespace
@@ -30,46 +29,47 @@ Use ``ip netns delete <network namespace name>`` to delete a network namespace.
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip netns delete test1
-    ubuntu@docker-host-aws:~$ ip netns list
-    ubuntu@docker-host-aws:~$
+    $ ip netns delete test1
+    $ ip netns list
+    $
 
-Execute CMD within Network Namespace
+Execute commands within a Network Namespace
 -------------------------------------
 
-How to check interfaces in a particular network namespace, we can use command ``ip netns exec <network namespace name> <command>`` like:
+To check interfaces in a particular network namespace, we can use command ``ip netns exec <network namespace name> <command>`` like:
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip a
+    $ ip netns add test1
+    $ ip netns exec test1 ip a
     1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    ubuntu@docker-host-aws:~$
+    $
 
 ``ip a`` will list all ip interfaces within this ``test1`` network namespaces. From the output we can see that the ``lo`` inteface is ``DOWN``, 
-we can run a command to let it up.
+we can run a command to set it up.
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip link
+    $ ip netns exec test1 ip link
     1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip link set dev lo up
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip link
+    $ ip netns exec test1 ip link set dev lo up
+    $ ip netns exec test1 ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 
-The status of lo became ``UNKNOWN``, please ignore that and go on.
+The status of lo became ``UNKNOWN``, you can ignore that and continue on.
 
 Add Interface to a Network Namespace
 ------------------------------------
 
-We will create a virtual interface pair, it has two virtual interfaces which are connected by a virtual cable
+We will create a virtual interface pair: it has two virtual interfaces which are connected by a virtual cable
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip link add veth-a type veth peer name veth-b
-    ubuntu@docker-host-aws:~$ ip link
+    $ ip link add veth-a type veth peer name veth-b
+    $ ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
@@ -80,15 +80,15 @@ We will create a virtual interface pair, it has two virtual interfaces which are
         link/ether 52:58:31:ef:0b:98 brd ff:ff:ff:ff:ff:ff
     28: veth-a: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
         link/ether 3e:89:92:ac:ef:10 brd ff:ff:ff:ff:ff:ff
-    ubuntu@docker-host-aws:~$
+    $
 
-All these two interfaces are located on localhost default network namespace. what we will do is move one of them to ``test1`` network namespace,
+These two interfaces are located on localhost default network namespace. what we will do is move one of them to ``test1`` network namespace,
 we can do this through:
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip link set veth-b netns test1
-    ubuntu@docker-host-aws:~$ ip link
+    $ ip link set veth-b netns test1
+    $ ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
@@ -97,14 +97,15 @@ we can do this through:
         link/ether 02:42:a7:88:bd:32 brd ff:ff:ff:ff:ff:ff
     28: veth-a: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
         link/ether 3e:89:92:ac:ef:10 brd ff:ff:ff:ff:ff:ff
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip link
+    
+    $ ip netns exec test1 ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     27: veth-b: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
         link/ether 52:58:31:ef:0b:98 brd ff:ff:ff:ff:ff:ff
-    ubuntu@docker-host-aws:~$
+    $
 
-Now, the interface ``veth-b`` is in network namespace ``test1``.
+Notice how the ``veth-b`` is missing from the first output?  That's because you mover it to the network namespace ``test1``.
 
 Assign IP address to veth interface
 ------------------------------------
@@ -113,9 +114,9 @@ In the localhost to set ``veth-a``
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip addr add 192.168.1.1/24 dev veth-a
-    ubuntu@docker-host-aws:~$ sudo ip link set veth-a up
-    ubuntu@docker-host-aws:~$ ip link
+    $ ip addr add 192.168.1.1/24 dev veth-a
+    $ ip link set veth-a up
+    $ ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
@@ -129,9 +130,9 @@ In the localhost to set ``veth-a``
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip addr add 192.168.1.2/24 dev veth-b
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip link set dev veth-b up
-    ubuntu@docker-host-aws:~$ ip link
+    $ ip netns exec test1 ip addr add 192.168.1.2/24 dev veth-b
+    $ ip netns exec test1 ip link set dev veth-b up
+    $ ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
@@ -140,17 +141,17 @@ In the localhost to set ``veth-a``
         link/ether 02:42:a7:88:bd:32 brd ff:ff:ff:ff:ff:ff
     28: veth-a: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
         link/ether 3e:89:92:ac:ef:10 brd ff:ff:ff:ff:ff:ff
-    ubuntu@docker-host-aws:~$ sudo ip netns exec test1 ip link
+    $ ip netns exec test1 ip link
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     27: veth-b: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
         link/ether 52:58:31:ef:0b:98 brd ff:ff:ff:ff:ff:ff
 
-After configured ``veth-b`` and up it, both ``veth-a`` and ``veth-b`` are UP. Now we can use ``ping`` to check their connectivity.
+After we configured ``veth-b`` and brought it up, both ``veth-a`` and ``veth-b`` are UP. Now we can use ``ping`` to check their connectivity. (Use control-c to stop the ping.)
 
 .. code-block:: bash
 
-    ubuntu@docker-host-aws:~$ ping 192.168.1.2
+    $ ping 192.168.1.2
     PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
     64 bytes from 192.168.1.2: icmp_seq=1 ttl=64 time=0.047 ms
     64 bytes from 192.168.1.2: icmp_seq=2 ttl=64 time=0.046 ms
@@ -159,7 +160,7 @@ After configured ``veth-b`` and up it, both ``veth-a`` and ``veth-b`` are UP. No
     --- 192.168.1.2 ping statistics ---
     3 packets transmitted, 3 received, 0% packet loss, time 1998ms
     rtt min/avg/max/mdev = 0.046/0.048/0.052/0.006 ms
-    ubuntu@docker-host-aws:~$
+    $
 
 
 Please go to http://www.opencloudblog.com/?p=66 to learn more.
