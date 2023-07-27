@@ -40,6 +40,7 @@ docker build
 Create a directory for ``Dockerfile`` in current folder.
 
 .. code-block:: bash
+
   $ cd ~
   $ mkdir docker_demo
   $ cd docker_demo
@@ -47,6 +48,7 @@ Create a directory for ``Dockerfile`` in current folder.
 Edit a new file named ``Dockerfile`` with the following contents:
 
 .. code-block:: bash
+  
   $ cat <<EOF > Dockerfile
   FROM        ubuntu:14.04
   MAINTAINER  <<your email address>>
