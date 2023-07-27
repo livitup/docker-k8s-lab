@@ -37,32 +37,30 @@ If the image has already on your host.
 docker build
 ~~~~~~~~~~~~
 
-Create a ``Dockerfile`` in current folder.
+Create a directory for ``Dockerfile`` in current folder.
 
 .. code-block:: bash
-  cd ~
-  mkdir docker_demo
+  $ cd ~
+  $ mkdir docker_demo
+  $ cd docker_demo
 
 Edit a new file named ``Dockerfile`` with the following contents:
 
 .. code-block:: bash
-
+  $ cat <<EOF > Dockerfile
   FROM        ubuntu:14.04
   MAINTAINER  <<your email address>>
   RUN         apt-get update && apt-get install -y redis-server
   EXPOSE      6379
   ENTRYPOINT  ["/usr/bin/redis-server"]
+EOF
 
 Use ``docker build`` to create a image.  Tag the version as 0.1 indicating it's an alpha build.
 
 .. code-block:: bash
 
   $ docker build -t redis_localdemo:0.1 .
-  $ docker images
-  REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-  redis_localdemo     0.1                 ccbca61a8ed4        7 seconds ago       212.4 MB
-  ubuntu              14.04               3f755ca42730        2 days ago          187.9 MB
-
+  
 docker history
 ~~~~~~~~~~~~~~
 
@@ -97,7 +95,7 @@ docker images
 docker rmi
 ~~~~~~~~~~
 
-Remove docker images.  Use the Image ID found via the ``docker images`` command.
+The ``docker rmi`` comand will remove docker images.  Use the `Image ID` found via the ``docker images`` command to delete the ``Ubuntu`` image you installed earlier.
 
 .. code-block:: bash
 
@@ -110,6 +108,11 @@ Remove docker images.  Use the Image ID found via the ``docker images`` command.
   Deleted: sha256:cc4264e967e293d5cc16e5def86a0b3160b7a3d09e7a458f781326cd2cecedb1
   Deleted: sha256:3181634137c4df95685d73bfbc029c47f6b37eb8a80e74f82e01cd746d0b4b66
 
+.. code-block:: bash
+
+  $ docker images
+  REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+  redis_localdemo     0.1                 9789f6256bf2        15 minutes ago      204MB
 
 Docker Containers
 -----------------
@@ -184,7 +187,7 @@ Using ``docker ps`` we can see all running Containers.
 stop/remove containers
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Sometime, we want to manage multiple containers each time,  like ``start``, ``stop``, ``rm``.
+Sometimes we want to manage multiple containers at one time, using commands like ``start``, ``stop``, ``rm``.
 
 List the running containers:
 
@@ -193,7 +196,7 @@ List the running containers:
   CONTAINER ID   IMAGE                 COMMAND                  CREATED         STATUS         PORTS      NAMES
   c6c0c39d3858   redis_localdemo:0.1   "/usr/bin/redis-serv…"   2 minutes ago   Up 2 seconds   6379/tcp   demo
 
-Stop a running container:
+Stop a running container using the `CONTAINER ID` shown by ``docker ps``:
 
 .. code-block:: bash
   $ docker stop c6c0c39d3858
@@ -236,3 +239,5 @@ At last, we can batch processing these containers, like remove them all or start
   $ docker rm $(docker ps -aq --filter "status=exited")
   3e7f1004fd0b
   811c860d5841
+  $ docker ps -a
+  $
