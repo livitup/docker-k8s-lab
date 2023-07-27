@@ -48,14 +48,14 @@ Create a directory for ``Dockerfile`` in current folder.
 Edit a new file named ``Dockerfile`` with the following contents:
 
 .. code-block:: bash
-  
+
   $ cat <<EOF > Dockerfile
   FROM        ubuntu:14.04
   MAINTAINER  <<your email address>>
   RUN         apt-get update && apt-get install -y redis-server
   EXPOSE      6379
   ENTRYPOINT  ["/usr/bin/redis-server"]
-EOF
+  EOF
 
 Use ``docker build`` to create a image.  Tag the version as 0.1 indicating it's an alpha build.
 
