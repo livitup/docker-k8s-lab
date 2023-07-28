@@ -82,7 +82,7 @@ You can also use ``brctl`` command to get bridge docker0 information.  First ins
 
 .. code-block:: bash
 
-  $ yum install bridge-utils
+  $ yum install bridge-utils net-utils
   Loaded plugins: fastestmirror, ovl
   Loading mirror speeds from cached hostfile
   * base: nl.mirrors.clouvider.net

@@ -3,29 +3,9 @@ Host Network Deep Dive
 
 In host network mode, the container and the host will be in the same network namespace.
 
-Docker version for this lab:
+Before starting this lab, let's start from a clean environment.  Create a new instance in the play-with-k8s sandbox by clicking the "Add new Instance" button in the left menu.
 
-.. code-block:: bash
-
-  $ docker version
-  Client:
-   Version:      1.11.2
-   API version:  1.23
-   Go version:   go1.5.4
-   Git commit:   b9f10c9
-   Built:        Wed Jun  1 21:23:11 2016
-   OS/Arch:      linux/amd64
-
-  Server:
-   Version:      1.11.2
-   API version:  1.23
-   Go version:   go1.5.4
-   Git commit:   b9f10c9
-   Built:        Wed Jun  1 21:23:11 2016
-   OS/Arch:      linux/amd64
-   docker
-   
-Start a container in host network mode with ``--net=host``.
+Next, start a container in host network mode with ``--net=host``.
 
 .. code-block:: bash
 
@@ -66,7 +46,7 @@ Start a container in host network mode with ``--net=host``.
       }
   ]
 
-Unlike bridge network mode, there is no veth pair. Go to the inside of the container.
+Unlike bridge network mode, there is no veth pair. Go to the inside of the container and run some tests.
 
 .. code-block:: bash
 
@@ -108,13 +88,10 @@ Unlike bridge network mode, there is no veth pair. Go to the inside of the conta
   2 packets transmitted, 2 received, 0% packet loss, time 1001ms
   rtt min/avg/max/mdev = 7.342/7.346/7.350/0.004 ms
 
-The container has the same ip/mac address as the host. we see that when using host mode networking,
+The container has the same ip/mac address as the host. When using host mode networking
 the container effectively inherits the IP address from its host. This mode is faster than the bridge
 mode (because there is no routing overhead), but it exposes the container directly to the public network,
-with all its security implications [#f1]_.
-
-
-
+with all the related security implications [#f1]_.
 
 Reference
 ----------

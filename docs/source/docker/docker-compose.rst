@@ -6,7 +6,7 @@ Docker Compose Networking Deep Dive
   We suggest that you should complete the lab :doc:`bridged-network` firstly before going to this lab.
 
 This lab will use ``example-voting-app`` as the demo application run by docker-compose, you can find the source code of the project in
-https://github.com/DaoCloud/example-voting-app
+https://github.com/DaoCloud
 
 Using Compose is basically a three-step process. [#f1]_
 
@@ -14,28 +14,20 @@ Using Compose is basically a three-step process. [#f1]_
 2. Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
 3. Lastly, run docker-compose up and Compose will start and run your entire app.
 
-For ``example-voting-app``, we already have ``Dockerfile`` and ``docker-compose.yml``, what need to do is ``docker-compose up``.
+.. note::
+  Unfortunatley, at the end of all this, the app will start, but won't respond to web requests.  Sorry, I'm a Docker/K8s guy, not a javascript developer.  The lab is still informative from a DevOps perspective.
 
-Install Docker Compose
-----------------------
-
-There are many ways to install docker compose [#f2]_.
-
-In our one node docker engine lab environment :doc:`../lab-environment`
-we install docker compose as the following way in one docker host.
-
-.. code-block:: bash
-
-  ubuntu@docker-node1:~$ sudo curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-  ubuntu@docker-node1:~$ sudo chmod +x /usr/local/bin/docker-compose
-  ubuntu@docker-node1:~$ docker-compose -v
-  docker-compose version 1.9.0, build 2585387
-
-Start APP
+Build APP
 ----------
 
-Clone ``example-voting-app`` repository to docker host, it defined five containers: ``voting-app``, ``result-app``, ``worker``, ``redis``, ``db``.
+Clone the ``example-voting-app`` repository to docker host. The app defines five containers: ``voting-app``, ``result-app``, ``worker``, ``redis``, ``db``.
 and two networks: ``front-tier``, ``back-tier`` through ``docker-compose.yml``.
+.. code-block:: bash
+  $ cd ~
+    $ git clone https://github.com/livitup.git
+    $ cd example-voting-app/
+
+The app's configuration file looks like this:
 
 .. code-block:: bash
 
@@ -94,47 +86,47 @@ and two networks: ``front-tier``, ``back-tier`` through ``docker-compose.yml``.
     front-tier:
     back-tier:
 
-Then run ``docker-compose build`` to build required docker images. This will take some time.
+Run ``docker-compose build`` to build required docker images. This will take some time, and a lot of status information will scroll past.  You'll also see some warning messages, but those can be safely ignored.  The final line should show:
+
+.. code-block:: bash
+  $ docker-compose build
+  ... lots of status will scroll by ...
+  Successfully tagged example-voting-app_result-app:latest
+
+Run APP
+----------
+
+Next we will use docker-compose to start the application.  We use the ``--detach`` argument to return to the command prompt when the containers are all started.  Without ``-detach`` the system would wait for the conatiners to exit before returning to the command prompt.
 
 .. code-block:: bash
 
-  ubuntu@docker-node1:~$ git clone https://github.com/DaoCloud/example-voting-app
-  ubuntu@docker-node1:~$ cd example-voting-app/
-  ubuntu@docker-node1:~/example-voting-app$ sudo docker-compose build
+  $ docker-compose up --detach
+  Starting example-voting-app_redis_1 ... done
+  Starting example-voting-app_db_1         ... done
+  Starting example-voting-app_voting-app_1 ... done
+  Starting example-voting-app_result-app_1 ... done
+  Starting example-voting-app_worker_1     ... done
+  $
 
-
-  ubuntu@docker-node1:~/example-voting-app$ sudo docker-compose up
-  Creating network "examplevotingapp_front-tier" with the default driver
-  Creating network "examplevotingapp_back-tier" with the default driver
-  Creating volume "examplevotingapp_db-data" with default driver
-  ....
-  Creating examplevotingapp_db_1
-  Creating examplevotingapp_redis_1
-  Creating examplevotingapp_voting-app_1
-  Creating examplevotingapp_result-app_1
-  Creating examplevotingapp_worker_1
-  Attaching to examplevotingapp_redis_1, examplevotingapp_db_1, examplevotingapp_result-app_1, examplevotingapp_voting-app_1, examplevotingapp_worker_1
-  ...
-
-There will be five containers, two bridge networks and seven veth interfaces created.
+There will be five containers, two bridge networks and seven veth interfaces created.  We can inspect them with the commands we learned earlier in the lab.
 
 .. code-block:: bash
 
-  ubuntu@docker-node1:~/example-voting-app$ sudo docker ps
+  $ docker ps
   CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                     NAMES
   c9c4e7fe7b6c        examplevotingapp_worker       "/usr/lib/jvm/java-7-"   About an hour ago   Up 5 seconds                                  examplevotingapp_worker_1
   4213167049aa        examplevotingapp_result-app   "node server.js"         About an hour ago   Up 4 seconds        0.0.0.0:5001->80/tcp      examplevotingapp_result-app_1
   8711d687bda9        examplevotingapp_voting-app   "python app.py"          About an hour ago   Up 5 seconds        0.0.0.0:5000->80/tcp      examplevotingapp_voting-app_1
   b7eda251865d        redis                         "docker-entrypoint.sh"   About an hour ago   Up 5 seconds        0.0.0.0:32770->6379/tcp   examplevotingapp_redis_1
   7d6dbb98ce40        postgres:9.4                  "/docker-entrypoint.s"   About an hour ago   Up 5 seconds        5432/tcp                  examplevotingapp_db_1
-  ubuntu@docker-node1:~/example-voting-app$ sudo docker network ls
+  $ docker network ls
   NETWORK ID          NAME                          DRIVER              SCOPE
   3b5cfe4aafa1        bridge                        bridge              local
   69a019d00603        examplevotingapp_back-tier    bridge              local
   6ddb07377c35        examplevotingapp_front-tier   bridge              local
   b1670e00e2a3        host                          host                local
   6006af29f010        none                          null                local
-  ubuntu@docker-node1:~/example-voting-app$ brctl show
+  $ brctl show
   bridge name	bridge id		STP enabled	interfaces
   br-69a019d00603		8000.0242c780244f	no		veth2eccb94
   							veth374be12
@@ -144,13 +136,13 @@ There will be five containers, two bridge networks and seven veth interfaces cre
   br-6ddb07377c35		8000.02421dac7490	no		veth156c0a9
   							vethaba6401
 
-Through ``docker network inspect``, we can know which container connnect with the bridge.
+Through ``docker network inspect``, we can know which container connnects with the bridge.
 
-There are two containers connect with docker network ``examplevotingapp_front-tier``.
+There are two containers connected to the docker network ``examplevotingapp_front-tier``.
 
 .. code-block:: bash
 
-  ubuntu@docker-node1:~/example-voting-app$ sudo docker network inspect examplevotingapp_front-tier
+  $ docker network inspect examplevotingapp_front-tier
   [
       {
           "Name": "examplevotingapp_front-tier",
@@ -190,11 +182,11 @@ There are two containers connect with docker network ``examplevotingapp_front-ti
       }
   ]
 
-There are five containers connect with docker network ``examplevotingapp_back-tier``.
+There are five containers connected to the docker network ``examplevotingapp_back-tier``.
 
 .. code-block:: bash
 
-  ubuntu@docker-node1:~/example-voting-app$ sudo docker network inspect examplevotingapp_back-tier
+  $ docker network inspect examplevotingapp_back-tier
   [
       {
           "Name": "examplevotingapp_back-tier",
@@ -283,6 +275,21 @@ Network Topology
 .. image:: _image/docker-compose.png
 
 For bridge network connection details, please reference lab :doc:`bridged-network`
+
+Cleaning up
+-------------
+
+Use the ``docker-compose down`` command to terminate your containers.
+
+.. code-block:: bash
+  $ docker-compose down
+  Stopping example-voting-app_worker_1     ... done
+  Stopping example-voting-app_voting-app_1 ... done
+  Stopping example-voting-app_result-app_1 ... done
+  Stopping example-voting-app_db_1         ... done
+  Stopping example-voting-app_redis_1      ... done
+  Removing network example-voting-app_back-tier
+  Removing network example-voting-app_front-tier
 
 Reference
 ---------

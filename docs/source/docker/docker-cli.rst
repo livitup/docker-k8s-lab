@@ -236,7 +236,7 @@ Secondly, we can use ``-q`` option to list only containers ids
   3e7f1004fd0b
   811c860d5841
 
-At last, we can batch processing these containers, like remove them all or start them all:
+At last, we can run batch processing commands on these containers, like remove them all or start them all:
 
 .. code-block:: bash
 
