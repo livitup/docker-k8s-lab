@@ -15,8 +15,8 @@ Preview Docker concepts with this video: https://www.youtube.com/watch?v=rOTqprH
 
 .. warning::
 
-  This is just a lab guide, not a documentation for docker or kubernetes, please go to their online documentation sites for more details about
-  what docker or kubernetes is and how does it work.
+  This is just a lab guide, not documentation for docker or kubernetes. Please go to their online documentation sites for more details about
+  what docker or kubernetes are and how they work.
 
 Table of Contents
 -----------------
