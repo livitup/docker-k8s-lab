@@ -22,6 +22,7 @@ Build APP
 
 Clone the ``example-voting-app`` repository to docker host. The app defines five containers: ``voting-app``, ``result-app``, ``worker``, ``redis``, ``db``.
 and two networks: ``front-tier``, ``back-tier`` through ``docker-compose.yml``.
+
 .. code-block:: bash
   $ cd ~
     $ git clone https://github.com/livitup.git
