@@ -91,6 +91,7 @@ The app's configuration file looks like this:
 Run ``docker-compose build`` to build required docker images. This will take some time, and a lot of status information will scroll past.  You'll also see some warning messages, but those can be safely ignored.  The final line should show:
 
 .. code-block:: bash
+
   $ docker-compose build
   ... lots of status will scroll by ...
   Successfully tagged example-voting-app_result-app:latest
@@ -284,6 +285,7 @@ Cleaning up
 Use the ``docker-compose down`` command to terminate your containers.
 
 .. code-block:: bash
+  
   $ docker-compose down
   Stopping example-voting-app_worker_1     ... done
   Stopping example-voting-app_voting-app_1 ... done
