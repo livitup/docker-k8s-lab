@@ -145,7 +145,7 @@ If we want to specify which port on host want to bind:
   CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                            NAMES
   4f548139a4be        nginx               "nginx -g 'daemon off"   5 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp, 443/tcp      demo1
   0fb783dcd5b3        nginx               "nginx -g 'daemon off"   2 minutes ago       Up 2 minutes        443/tcp, 0.0.0.0:32768->80/tcp   demo
-  $ curl 192.168.0.13:32768
+  $ curl 192.168.0.13:80
   <!DOCTYPE html>
   <html>
   <head>
