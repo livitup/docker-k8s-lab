@@ -25,7 +25,7 @@ and two networks: ``front-tier``, ``back-tier`` through ``docker-compose.yml``.
 
 .. code-block:: bash
   $ cd ~
-    $ git clone https://github.com/livitup.git
+    $ git clone https://github.com/livitup/example-voting-app
     $ cd example-voting-app/
 
 The app's configuration file looks like this:
