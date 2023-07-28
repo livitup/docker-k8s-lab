@@ -1,2 +1,0 @@
-Get Start with minikube
-=======================
