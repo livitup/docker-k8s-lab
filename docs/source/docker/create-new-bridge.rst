@@ -160,6 +160,7 @@ Use ``docker network connect demo-bridge test2`` command to connect container ``
 
 Now the container ``test2`` has connected with the default ``docker0`` bridge and ``demo-bridge``. We can do them same action
 to connect container ``test3`` to ``demo-bridge`` network. 
+
 .. code-block:: bash
 
   $ docker network connect demo-bridge test3
